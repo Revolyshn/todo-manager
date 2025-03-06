@@ -3,6 +3,7 @@ package storage
 import (
 	"encoding/json"
 	"os"
+
 	"github.com/Revolyshn/todo-manager/internal/task"
 )
 
@@ -17,7 +18,7 @@ func NewStorage(filePath string) *Storage {
 }
 
 func (s *Storage) Save(tasks []task.Task) error {
-	file, err := os.Create(s.FilePath)
+	file, err := os.Create(s.FilePath) // Создает файл, если его нет
 	if err != nil {
 		return err
 	}
@@ -28,6 +29,12 @@ func (s *Storage) Save(tasks []task.Task) error {
 }
 
 func (s *Storage) Load() ([]task.Task, error) {
+	// Проверяем, существует ли файл
+	if _, err := os.Stat(s.FilePath); os.IsNotExist(err) {
+		// Если файл не существует, возвращаем пустой список задач
+		return []task.Task{}, nil
+	}
+
 	file, err := os.Open(s.FilePath)
 	if err != nil {
 		return nil, err
